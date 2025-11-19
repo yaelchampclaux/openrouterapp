@@ -1,0 +1,73 @@
+{# templates/chat/index.html.twig #}
+{% extends 'base.html.twig' %}
+
+{% block title %}OpenRouter Chat{% endblock %}
+
+{% block body %}
+
+    <div id="chat-tab" class="tab-content active">
+        <h1>OpenRouter Chat</h1>
+        
+        <div class="navigation">
+            <a href="{{ path('chat_history') }}">View Chat History</a>
+            <a href="https://status.openrouter.ai/" class="navigation-link">Check Status</a>
+            <a href="https://openrouter.ai/settings/credits" class="navigation-link">Check Credits</a>
+            <a href="https://lmarena.ai/?leaderboard" class="navigation-link">Check Best AI 1</a>
+            <a href="https://livebench.ai/#/" class="navigation-link">Check Best AI 2</a>
+            <button onclick="displayAllModels()" class="navigation-link">List Models</button>
+            <button onclick="resetConversation()" class="new-conversation-button">New Conversation</button>
+        </div>
+
+        <div class="radio-group">
+            <label>
+                <input type="radio" name="model-filter" value="all" checked onchange="filterModels()"> All <span id="all-count">(0)</span>
+            </label>
+            <label>
+                <input type="radio" name="model-filter" value="free" onchange="filterModels()"> Free <span id="free-count">(0)</span>
+            </label>
+            <label>
+                <input type="radio" name="model-filter" value="paid" onchange="filterModels()"> Paying <span id="paid-count">(0)</span>
+            </label>
+        </div>
+
+        <div class="checkbox-group">
+            <label>
+                <input type="checkbox" id="coding-filter" onchange="filterModels()"> Coding Models
+                <span id="coding-count"></span>
+            </label>
+            <label>
+                <input type="checkbox" id="image-processing-filter" onchange="filterModels()"> Image
+                <span id="image-processing-count"></span>
+            </label>
+            <label>
+                <input type="checkbox" id="pdf-processing-filter" onchange="filterModels()"> PDF
+                <span id="pdf-processing-count"></span>
+            </label>
+            <label>
+                <input type="checkbox" id="xlsx-processing-filter" onchange="filterModels()"> Excel
+                <span id="xlsx-processing-count"></span>
+            </label>
+        </div>
+
+        <select id="model" onchange="displayModelDescription()"></select>
+        <div id="model-description"></div>
+        <input type="text" id="chat-title" placeholder="Enter chat title (optional)">
+        <div class="chat-input-container">
+            <textarea id="prompt" rows="5" placeholder="Ask something..."></textarea>
+            <div class="input-buttons">
+                <button id="send-button" onclick="handleSendMessage()">Send</button>
+                <input type="file" id="file-upload" accept="image/*,application/pdf" style="display:none;" />
+                <button id="upload-file-button" onclick="triggerFileUpload()" style="display:none;">
+                    <i class="fa-solid fa-plus"></i>
+                </button>
+            </div>
+        </div>
+        <div class="response" id="response"></div>
+        <div class="chat-controls">
+        </div>
+    </div>
+{% endblock %}
+
+{% block page_scripts %}
+    <script src="{{ asset('js/openrouter-chat.js') }}"></script>
+{% endblock %}

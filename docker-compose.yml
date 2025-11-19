@@ -1,0 +1,88 @@
+networks: 
+  openrouterappnetwork:
+    driver: bridge
+services:
+#MariaDB /run/secrets/db_root_password
+  db:
+    container_name: db-ora2
+    restart: unless-stopped
+    image: mariadb:11.6
+    networks:
+      - openrouterappnetwork
+    ports:
+      - "3508:3306"
+    volumes:
+      - ./db:/var/lib/mariadb
+    environment:
+      MARIADB_ROOT_PASSWORD: openrouterappdbrootpassword
+      MARIADB_DATABASE: openrouterapp
+#Phpmyadmin /run/secrets/db_root_password
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:latest
+    container_name: pma-ora2
+    restart: always
+    depends_on:
+      - db
+    ports:
+      - "9311:80"
+    environment:
+      MARIADB_ROOT_PASSWORD: openrouterappdbrootpassword
+      UPLOAD_LIMIT: 64M
+      PHP_UPLOAD_MAX_FILESIZE: 64M
+      PHP_POST_MAX_SIZE: 64M
+
+    networks:
+      - openrouterappnetwork
+#PHP
+  www:
+    user: you
+    build: ./docker/php
+    container_name: www-ora2
+    networks:
+      - openrouterappnetwork
+    volumes:
+      - ./www:/home/you/openrouterapp
+    ports:
+      - 9310:8800
+    environment:
+      SHELL_VERBOSITY: DEBUG
+    healthcheck:
+      test: ["CMD", "php", "-v"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+#Mkdocs      
+  mkdocs:
+    container_name: doc-ora2
+    build: ./docker/mkdocs
+    ports:
+      - "9312:8000"
+    volumes:
+      - ./mkdocs:/app
+    stdin_open: true
+    tty: true
+    restart: unless-stopped
+    networks:
+      - openrouterappnetwork
+#Symfony
+  database:
+    image: postgres:${POSTGRES_VERSION:-16}-alpine
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-app}
+      # You should definitely change the password in production
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-!ChangeMe!}
+      POSTGRES_USER: ${POSTGRES_USER:-app}
+    healthcheck:
+      test: ["CMD", "pg_isready", "-d", "${POSTGRES_DB:-app}", "-U", "${POSTGRES_USER:-app}"]
+      timeout: 5s
+      retries: 5
+      start_period: 60s
+    volumes:
+      - database_data:/var/lib/postgresql/data:rw
+    ports:
+      - "5432"
+volumes:
+  db:
+  www:
+  mkdocs:
+  database_data:

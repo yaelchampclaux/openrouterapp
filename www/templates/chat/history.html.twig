@@ -1,0 +1,328 @@
+{# templates/chat/history.html.twig #}
+{% extends 'base.html.twig' %}
+{% block title %}OpenRouter Chat History{% endblock %}
+{% block stylesheets %}
+    {{ parent() }}
+	<link rel="stylesheet" href="{{ asset('css/history.css') }}">
+{% endblock %}
+{% block body %}  
+    <h1>OpenRouter Chat History</h1>
+    
+    <div class="navigation">
+        <a href="{{ path('spa_chat') }}">Back to Chat</a>
+    </div>
+    
+    {% if history|length > 0 %}
+        <select class="history-selector" id="history-select">
+            <option value="">Select a conversation...</option>
+            {% for item in history %}
+                <option value="{{ item.id }}">
+                     {{ item.title ?: 'Untitled Chat' }} - {{ item.createdAt|date('Y-m-d H:i:s') }} - {{ item.model }}
+                </option>
+            {% endfor %}
+        </select>
+
+        <div id="history-detail"></div>
+        
+    {% else %}
+        <div class="no-history">
+            <p>No chat history found.</p>
+        </div>
+    {% endif %}
+{% endblock %}
+
+{% block javascript %}
+    {{ parent() }}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const historySelect = document.getElementById('history-select');
+            const historyDetail = document.getElementById('history-detail');
+            const historyData = {{ history|json_encode|raw }};
+            let conversationsByTitle = {};
+            
+            // Group conversations by title for easy access
+            historyData.forEach(item => {
+                if (!conversationsByTitle[item.title]) {
+                    conversationsByTitle[item.title] = [];
+                }
+                conversationsByTitle[item.title].push(item);
+            });
+            
+            historySelect.addEventListener('change', async function() {
+                const selectedId = this.value;
+                if (!selectedId) {
+                    historyDetail.innerHTML = '';
+                    return;
+                }
+                
+                const selectedItem = historyData.find(item => item.id == selectedId);
+                if (selectedItem) {
+                    // Convert Markdown to HTML for prompt and response using Marked.js
+                    const formattedPrompt = typeof marked !== 'undefined' ? marked.parse(selectedItem.prompt) : escapeHTML(selectedItem.prompt);
+                    const formattedResponse = typeof marked !== 'undefined' ? marked.parse(selectedItem.response) : escapeHTML(selectedItem.response);
+
+                    // Find related conversations
+                    const relatedConversations = conversationsByTitle[selectedItem.title] || [];
+                    const isInitialMessage = relatedConversations.length > 0 && 
+                                           relatedConversations[0].id == selectedId;
+                    const isFinalMessage = relatedConversations.length > 0 && 
+                                          relatedConversations[relatedConversations.length - 1].id == selectedId;
+                    
+                    historyDetail.innerHTML = `
+                        <div class="history-item">
+                            <div class="history-header">
+                                <div class="model">Model: ${selectedItem.model}</div>
+                                <div class="title">Title: ${selectedItem.title || 'Untitled Chat'}</div>
+                                <div class="timestamp">${new Date(selectedItem.createdAt).toLocaleString()}</div>
+                            </div>
+                            <div class="prompt">
+                                <strong>Query:</strong>
+                                <div class="markdown-content">${formattedPrompt}</div>
+                            </div>
+                            <div class="response">
+                                <strong>Response:</strong>
+                                <div class="markdown-content">${formattedResponse}</div>
+                            </div>
+                            
+                            <div class="conversation-resume-section" data-message-id="${selectedId}" data-title="${selectedItem.title}" data-model="${selectedItem.model}">
+                                <h3>Resume Conversation</h3>
+                                <div id="resume-options-${selectedId}" class="resume-options">
+                                    <div id="summary-loading-${selectedId}" class="summary-loading">
+                                        <p>Calculating costs...</p>
+                                    </div>
+                                    
+                                    <div id="resume-controls-${selectedId}" class="resume-controls" style="display:none;">
+                                        <div class="resume-options-controls">
+                                            <label>
+                                                <input type="radio" name="context-type-${selectedId}" value="summary" id="summary-option-${selectedId}"> 
+                                                Intelligent Summary 
+                                                <span id="summary-info-${selectedId}" class="cost-info"></span>
+                                            </label>
+                                            <label>
+                                                <input type="radio" name="context-type-${selectedId}" value="complete" id="complete-option-${selectedId}" checked> 
+                                                Complete Context 
+                                                <span id="complete-info-${selectedId}" class="cost-info"></span>
+                                            </label>
+                                        </div>
+                                        <button onclick="resumeConversation('${selectedItem.title}', '${selectedItem.model}', '${selectedId}')" class="resume-button">
+                                            Resume Conversation
+                                        </button>
+                                    </div>
+                                    
+                                    <div id="create-summary-${selectedId}" class="create-summary" style="display:none;">
+                                        <p>No intelligent summary available for this conversation.</p>
+                                        <p class="cost-estimate">Estimated summary cost: <span id="summary-cost-estimate-${selectedId}"></span></p>
+                                        <div class="summary-buttons-container">
+                                            <button onclick="createSummary('${selectedItem.title}', '${selectedItem.model}', '${selectedId}')" class="create-summary-button">
+                                                Generate Intelligent Summary
+                                            </button>
+                                            <button onclick="resumeConversationWithFullContext('${selectedItem.title}', '${selectedItem.model}', '${selectedId}')" class="continue-full-context-button">
+                                                Continue Conversation (full context)
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+
+                    // Highlight all code blocks within the new content
+                    if (typeof hljs !== 'undefined') {
+                        historyDetail.querySelectorAll('pre code').forEach((block) => {
+                            hljs.highlightElement(block);
+                        });
+                    }
+                    
+                    // Check if summary is available
+                    checkForSummary(selectedItem.title, selectedId, selectedItem.model);
+                }
+            });
+        });
+        
+        // Format cost for display
+        function formatCost(cost) {
+            if (cost < 0.01) {
+                return `<$0.01`;
+            } else if (cost < 1) {
+                return `$${cost.toFixed(2)}`;
+            } else {
+                return `$${cost.toFixed(3)}`;
+            }
+        }
+        
+        // Format token count
+        function formatTokenCount(count) {
+            if (count >= 1000) {
+                return `${(count / 1000).toFixed(1)}k`;
+            }
+            return count.toString();
+        }
+        
+        // Check if a summary is available for this conversation
+        async function checkForSummary(title, messageId, modelId) {
+            try {
+                const loadingElement = document.getElementById(`summary-loading-${messageId}`);
+                const createSummaryElement = document.getElementById(`create-summary-${messageId}`);
+                const resumeControlsElement = document.getElementById(`resume-controls-${messageId}`);
+                
+                loadingElement.innerHTML = '<p>Fetching cost information...</p>';
+                
+                // Récupérer les informations de résumé directement depuis l'ID du message de l'historique
+                const response = await fetch(`/api/chat-history/${messageId}/resume-info`);
+                
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    loadingElement.innerHTML = `<p class="error">Error: ${errorData.error || 'Failed to fetch resume info'}</p>`;
+                    return;
+                }
+                
+                const resumeInfo = await response.json();
+                
+                // Mettre à jour les informations de coût et de tokens pour le contexte complet
+                const completeInfo = `(${formatTokenCount(resumeInfo.tokenEstimates.complete)} tokens, ${formatCost(resumeInfo.costs.complete)})`;
+                document.getElementById(`complete-info-${messageId}`).innerHTML = completeInfo;
+                    
+                // Si nous avons déjà un résumé
+                if (resumeInfo.hasSummary) {
+                    const summaryInfo = `(${formatTokenCount(resumeInfo.tokenEstimates.summary)} tokens, ${formatCost(resumeInfo.costs.summary)})`;
+                    document.getElementById(`summary-info-${messageId}`).innerHTML = summaryInfo;
+                    document.getElementById(`summary-option-${messageId}`).disabled = false;
+                    
+                    loadingElement.style.display = 'none';
+                    resumeControlsElement.style.display = 'block';
+                } else {
+                    // Pas de résumé, afficher l'option pour en créer un avec l'estimation
+                    const estimatedInfo = resumeInfo.summaryEstimated ? ' (estimated)' : '';
+                    const summaryEstimate = `${formatTokenCount(resumeInfo.tokenEstimates.summary)} tokens, ${formatCost(resumeInfo.costs.summary)}${estimatedInfo}`;
+                    document.getElementById(`summary-cost-estimate-${messageId}`).innerHTML = summaryEstimate;
+                    
+                    loadingElement.style.display = 'none';
+                    createSummaryElement.style.display = 'block';
+                }
+                
+            } catch (error) {
+                //console.error('Error checking for summary:', error);
+                document.getElementById(`summary-loading-${messageId}`).innerHTML = 
+                    `<p class="error">Error checking for summary: ${error.message}</p>`;
+            }
+        }
+
+        
+        // Create a summary for a conversation
+        async function createSummary(title, modelId, messageId) {
+            const createSummaryElement = document.getElementById(`create-summary-${messageId}`);
+            const resumeControlsElement = document.getElementById(`resume-controls-${messageId}`);
+            
+            createSummaryElement.innerHTML = '<p>Generating intelligent summary...</p>';
+            
+            try {
+                // D'abord, récupérer le thread complet de la conversation
+                const threadResponse = await fetch(`/api/chat-history/${messageId}/conversation-thread`);
+                
+                if (!threadResponse.ok) {
+                    const errorData = await threadResponse.json();
+                    throw new Error(errorData.error || 'Failed to fetch conversation thread');
+                }
+                
+                const threadData = await threadResponse.json();
+                //console.log("Retrieved conversation thread:", threadData);
+                
+                // Générer le résumé
+                const response = await fetch(`/api/chat-history/${messageId}/create-summary`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        conversationThread: threadData
+                    })
+                });
+                
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'Failed to create summary');
+                }
+                
+                const data = await response.json();
+                
+                // Update UI to show summary option
+                document.getElementById(`summary-option-${messageId}`).disabled = false;
+                const summaryInfo = `(${formatTokenCount(data.tokensCount)} tokens, ${formatCost(data.cost)})`;
+                document.getElementById(`summary-info-${messageId}`).innerHTML = summaryInfo;
+                
+                createSummaryElement.style.display = 'none';
+                resumeControlsElement.style.display = 'block';
+                
+                // Optionally show a success message
+                const successMessage = document.createElement('div');
+                successMessage.className = 'success-message';
+                successMessage.textContent = 'Summary created successfully!';
+                resumeControlsElement.insertBefore(successMessage, resumeControlsElement.firstChild);
+                
+                // Remove success message after 3 seconds
+                setTimeout(() => {
+                    successMessage.remove();
+                }, 3000);
+                
+            } catch (error) {
+                //console.error('Error creating summary:', error);
+                createSummaryElement.innerHTML = `
+                    <p class="error">Error creating summary: ${error.message}</p>
+                    <div class="summary-buttons-container">
+                        <button onclick="createSummary('${title}', '${modelId}', '${messageId}')" class="create-summary-button">
+                            Try Again
+                        </button>
+                        <button onclick="resumeConversationWithFullContext('${title}', '${modelId}', '${messageId}')" class="continue-full-context-button">
+                            Continue Conversation (full context)
+                        </button>
+                    </div>
+                `;
+            }
+        }
+        
+        // Resume a conversation with the selected context option
+        function resumeConversation(title, modelId, messageId) {
+            const contextType = document.querySelector(`input[name="context-type-${messageId}"]:checked`).value;
+            
+            // Store parameters in session storage to be retrieved in the chat page
+            sessionStorage.setItem('resume_conversation', JSON.stringify({
+                title: title,
+                modelId: modelId,
+                messageId: messageId,
+                contextType: contextType
+            }));
+            
+            // Navigate to chat page
+            window.location.href = '/';
+        }
+                
+        function escapeHTML(str) {
+            return str
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        function resumeConversationWithFullContext(title, modelId, messageId) {
+            // Stocke directement les paramètres avec contextType = 'complete'
+            sessionStorage.setItem('resume_conversation', JSON.stringify({
+                title: title,
+                modelId: modelId,
+                messageId: messageId,
+                contextType: 'complete'
+            }));
+            
+            // Rediriger vers la page de chat
+            window.location.href = '/';
+        }
+
+        marked.use({
+            highlight: function(code, lang) {
+                const language = hljs.getLanguage(lang) ? lang : 'plaintext';
+                return hljs.highlight(code, { language }).value;
+            },
+        });
+    </script>
+{% endblock %}

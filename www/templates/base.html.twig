@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>{% block title %}Welcome!{% endblock %}</title>
+        <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text><text y=%221.3em%22 x=%220.2em%22 font-size=%2276%22 fill=%22%23fff%22>sf</text></svg>">
+        {% block stylesheets %}
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+        <!-- Use GitHub Dark theme for better syntax highlighting -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+        <!-- Add custom enhanced styles -->
+        <link rel="stylesheet" href="{{ asset('css/openrouter.css') }}">
+        {% endblock %}
+
+        {% block javascripts %}
+        <script src="{{ asset('js/utils.js') }}"></script>
+        {% endblock %}
+    </head>
+    <body>
+        {% block body %}{% endblock %}
+        
+        {% block javascript %}
+        <!-- Load marked.js and highlight.js BEFORE other scripts -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.2/marked.min.js" 
+                onload="console.log('✅ Marked.js loaded')" 
+                onerror="console.error('❌ Failed to load Marked.js')"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" 
+                onload="console.log('✅ Highlight.js loaded')" 
+                onerror="console.error('❌ Failed to load Highlight.js')"></script>
+        
+        <!-- Enhanced configuration script -->
+        <script>
+            // Wait for both libraries to be available before configuring
+            function initializeLibraries() {
+                if (typeof marked !== 'undefined' && typeof hljs !== 'undefined') {
+                    console.log('🔧 Configuring Marked.js and Highlight.js...');
+                    
+                    // Configure Marked.js with enhanced options
+                    marked.use({
+                        highlight: function(code, lang) {
+                            const language = hljs.getLanguage(lang) ? lang : 'plaintext';
+                            return hljs.highlight(code, { language }).value;
+                        },
+                        breaks: true,
+                        gfm: true,
+                        tables: true,
+                        sanitize: false,
+                        smartLists: true,
+                        smartypants: true
+                    });
+
+                    // Auto-highlight existing code blocks on page load
+                    document.addEventListener('DOMContentLoaded', () => {
+                        console.log('🎯 DOM loaded, processing existing code blocks...');
+                        document.querySelectorAll('pre code').forEach((block) => {
+                            hljs.highlightElement(block);
+                        });
+                        
+                        // Enhance any existing content
+                        if (typeof enhanceExistingContent === 'function') {
+                            enhanceExistingContent();
+                        }
+                    });
+                    
+                    console.log('✅ Library configuration complete');
+                } else {
+                    console.log('⏳ Waiting for libraries to load...', {
+                        marked: typeof marked !== 'undefined',
+                        hljs: typeof hljs !== 'undefined'
+                    });
+                    setTimeout(initializeLibraries, 50);
+                }
+            }
+            
+            // Start initialization immediately
+            initializeLibraries();
+        </script>
+        
+        <!-- Page-specific scripts should load AFTER the libraries are configured -->
+        {% block page_scripts %}{% endblock %}
+        {% endblock %}
+    </body>
+</html>

@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Syntax Highlighting</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+    <style>
+        body {
+            background: #0f172a;
+            color: #e2e8f0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        
+        .response {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+            line-height: 1.6;
+            color: #e4e4e7;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            border-radius: 12px;
+            padding: 24px;
+            margin: 20px 0;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            max-width: 100%;
+            overflow-x: auto;
+            min-height: 50px;
+        }
+        
+        .response pre {
+            background: #0d1117 !important;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            padding: 16px;
+            margin: 16px 0;
+            overflow-x: auto;
+            position: relative;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+        }
+        
+        .response code {
+            font-family: 'Fira Code', 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 0.9em;
+            line-height: 1.5;
+        }
+        
+        .copy-code-button {
+            position: absolute !important;
+            top: 8px !important;
+            right: 8px !important;
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8) !important;
+            color: white !important;
+            border: none !important;
+            padding: 6px 12px !important;
+            border-radius: 6px !important;
+            cursor: pointer !important;
+            font-size: 0.8em !important;
+            font-weight: 500 !important;
+            transition: all 0.2s ease !important;
+            z-index: 10 !important;
+            box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3) !important;
+        }
+        
+        .debug-section {
+            background: #1e293b;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            border: 1px solid #334155;
+        }
+        
+        .test-button {
+            background: #3b82f6;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 14px;
+        }
+        
+        .test-button:hover {
+            background: #2563eb;
+        }
+        
+        #status {
+            background: #1f2937;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 10px 0;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔧 Debug Syntax Highlighting Test</h1>
+    
+    <div class="debug-section">
+        <h2>Library Status Check</h2>
+        <div id="status">Checking libraries...</div>
+        <button class="test-button" onclick="checkLibraries()">Recheck Libraries</button>
+    </div>
+    
+    <div class="debug-section">
+        <h2>Test Controls</h2>
+        <button class="test-button" onclick="testBashScript()">Test Bash Script</button>
+        <button class="test-button" onclick="testMultipleLanguages()">Test Multiple Languages</button>
+        <button class="test-button" onclick="testMarkdownParsing()">Test Full Markdown</button>
+        <button class="test-button" onclick="clearResponse()">Clear Response</button>
+    </div>
+    
+    <div class="debug-section">
+        <h2>Raw Markdown Input Test</h2>
+        <textarea id="rawMarkdown" rows="10" style="width: 100%; background: #374151; color: white; padding: 10px; border: 1px solid #6b7280; border-radius: 4px;">Here's a bash script to describe folder structure:
+
+```bash
+#!/bin/bash
+# Script to describe folder structure
+if [ -z "$1" ]; then
+    echo "Usage: $0 <folder_path>"
+    exit 1
+fi
+
+folder_path="$1"
+if [ ! -d "$folder_path" ]; then
+    echo "Error: '$folder_path' is not a directory"
+    exit 1
+fi
+
+echo "Folder structure for: $folder_path"
+echo "======================================"
+find "$folder_path" -type f | head -20
+```
+
+And here's some PHP code:
+
+```php
+<?php
+function describeFolderStructure($folderPath) {
+    if (!is_dir($folderPath)) {
+        throw new Exception("Path is not a directory");
+    }
+    
+    $iterator = new RecursiveIteratorIterator(
+        new RecursiveDirectoryIterator($folderPath)
+    );
+    
+    foreach ($iterator as $file) {
+        echo $file . "\n";
+    }
+}
+?>
+```</textarea>
+        <br><br>
+        <button class="test-button" onclick="testRawMarkdown()">Parse This Markdown</button>
+    </div>
+    
+    <div id="response" class="response">
+        <p>Click the test buttons above to check if syntax highlighting is working properly.</p>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.2/marked.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    
+    <script>
+        const responseDiv = document.getElementById('response');
+        const statusDiv = document.getElementById('status');
+        
+        function checkLibraries() {
+            let status = "📋 Library Status:\n";
+            status += `✅ marked.js: ${typeof marked !== 'undefined' ? 'Loaded' : '❌ Not loaded'}\n`;
+            status += `✅ highlight.js: ${typeof hljs !== 'undefined' ? 'Loaded' : '❌ Not loaded'}\n`;
+            
+            if (typeof hljs !== 'undefined') {
+                status += `📚 Languages supported: ${hljs.listLanguages().length}\n`;
+                status += `🔤 Common languages: ${['bash', 'javascript', 'php', 'python', 'java'].map(lang => 
+                    hljs.getLanguage(lang) ? `✅${lang}` : `❌${lang}`
+                ).join(', ')}\n`;
+            }
+            
+            statusDiv.textContent = status;
+        }
+        
+        function displayFormattedResponse(responseText) {
+            console.log('📝 Processing response:', responseText.substring(0, 100) + '...');
+            
+            if (typeof responseText === 'string' && responseText.trim() === '') {
+                responseDiv.innerHTML = ''; 
+                return;
+            }
+
+            if (typeof marked !== 'undefined') {
+                try {
+                    // Configure marked
+                    marked.setOptions({
+                        highlight: function(code, lang) {
+                            console.log(`🎨 Highlighting ${lang || 'unknown'} code:`, code.substring(0, 50) + '...');
+                            const language = hljs.getLanguage(lang) ? lang : 'plaintext';
+                            const result = hljs.highlight(code, { language }).value;
+                            console.log('✅ Highlight result:', result.substring(0, 50) + '...');
+                            return result;
+                        },
+                        breaks: true,
+                        gfm: true,
+                        tables: true,
+                        sanitize: false,
+                        smartLists: true,
+                        smartypants: true
+                    });
+
+                    const htmlContent = marked.parse(responseText);
+                    console.log('📄 Parsed HTML:', htmlContent.substring(0, 200) + '...');
+                    
+                    const tempDiv = document.createElement('div');
+                    tempDiv.innerHTML = htmlContent;
+                    
+                    // Process code blocks
+                    tempDiv.querySelectorAll('pre').forEach((preBlock, index) => {
+                        console.log(`🔍 Processing code block ${index + 1}`);
+                        const codeBlock = preBlock.querySelector('code');
+                        if (codeBlock) {
+                            // Detect language
+                            let language = 'plaintext';
+                            const classNames = codeBlock.className.split(' ');
+                            for (const className of classNames) {
+                                if (className.startsWith('language-')) {
+                                    language = className.replace('language-', '');
+                                    break;
+                                }
+                            }
+                            
+                            console.log(`🏷️ Detected language: ${language}`);
+                            
+                            // Add language attribute
+                            preBlock.setAttribute('data-language', language);
+                            
+                            // Ensure highlighting
+                            hljs.highlightElement(codeBlock);
+                            
+                            // Create copy button
+                            const copyButton = document.createElement('button');
+                            copyButton.className = 'copy-code-button';
+                            copyButton.innerHTML = '<i class="fas fa-copy"></i> Copy';
+                            
+                            copyButton.addEventListener('click', async (e) => {
+                                e.preventDefault();
+                                const codeToCopy = codeBlock.textContent;
+                                
+                                try {
+                                    await navigator.clipboard.writeText(codeToCopy);
+                                    copyButton.innerHTML = '<i class="fas fa-check"></i> Copied!';
+                                    copyButton.style.background = 'linear-gradient(135deg, #10b981, #059669)';
+                                    
+                                    setTimeout(() => {
+                                        copyButton.innerHTML = '<i class="fas fa-copy"></i> Copy';
+                                        copyButton.style.background = 'linear-gradient(135deg, #3b82f6, #1d4ed8)';
+                                    }, 2000);
+                                } catch (err) {
+                                    console.error('Copy error:', err);
+                                    copyButton.innerHTML = '<i class="fas fa-times"></i> Failed';
+                                }
+                            });
+                            
+                            preBlock.style.position = 'relative';
+                            preBlock.appendChild(copyButton);
+                        }
+                    });
+                    
+                    responseDiv.innerHTML = tempDiv.innerHTML;
+                    console.log('✅ Response updated successfully');
+                    
+                } catch (e) {
+                    console.error("❌ Markdown parsing error:", e);
+                    responseDiv.innerHTML = `<p style="color: #ef4444;">Error parsing response: ${e.message}</p><pre style="color: #d1d5db; white-space: pre-wrap;">${responseText}</pre>`;
+                }
+            } else {
+                console.error('❌ marked.js not available');
+                responseDiv.innerHTML = `<pre style="color: #d1d5db; white-space: pre-wrap;">${responseText}</pre>`;
+            }
+        }
+        
+        function testBashScript() {
+            const bashScript = `Here's a bash script to describe folder structure:
+
+\`\`\`bash
+#!/bin/bash
+# Script to describe folder structure passed as parameter
+
+if [ -z "$1" ]; then
+    echo "Usage: $0 <folder_path>"
+    exit 1
+fi
+
+folder_path="$1"
+
+if [ ! -d "$folder_path" ]; then
+    echo "Error: '$folder_path' is not a directory"
+    exit 1
+fi
+
+echo "Folder structure for: $folder_path"
+echo "======================================"
+
+# Display directory tree
+tree "$folder_path" 2>/dev/null || {
+    echo "Tree command not available, using find instead:"
+    find "$folder_path" -type d | sort
+}
+
+echo ""
+echo "File count by type:"
+echo "==================="
+find "$folder_path" -type f | sed 's/.*\\.//' | sort | uniq -c | sort -nr
+\`\`\`
+
+This script will show you the complete folder structure!`;
+            
+            displayFormattedResponse(bashScript);
+        }
+        
+        function testMultipleLanguages() {
+            const multiLang = `Here are examples in different languages:
+
+## Bash Script
+\`\`\`bash
+#!/bin/bash
+echo "Hello World"
+for i in {1..5}; do
+    echo "Number: $i"
+done
+\`\`\`
+
+## JavaScript
+\`\`\`javascript
+function greetUser(name) {
+    console.log(\`Hello \${name}!\`);
+    return true;
+}
+
+const users = ['Alice', 'Bob', 'Charlie'];
+users.forEach(user => greetUser(user));
+\`\`\`
+
+## PHP
+\`\`\`php
+<?php
+class UserManager {
+    private $users = [];
+    
+    public function addUser($name) {
+        $this->users[] = $name;
+        return count($this->users);
+    }
+    
+    public function getUsers() {
+        return $this->users;
+    }
+}
+
+$manager = new UserManager();
+$manager->addUser("John Doe");
+?>
+\`\`\`
+
+## Python
+\`\`\`python
+import os
+from pathlib import Path
+
+def analyze_folder(folder_path):
+    """Analyze folder structure and return statistics"""
+    path = Path(folder_path)
+    
+    if not path.exists():
+        raise FileNotFoundError(f"Path {folder_path} does not exist")
+    
+    files = list(path.rglob('*'))
+    directories = [f for f in files if f.is_dir()]
+    regular_files = [f for f in files if f.is_file()]
+    
+    return {
+        'total_files': len(regular_files),
+        'total_dirs': len(directories),
+        'size_mb': sum(f.stat().st_size for f in regular_files) / 1024 / 1024
+    }
+
+# Usage example
+stats = analyze_folder("/path/to/folder")
+print(f"Found {stats['total_files']} files in {stats['total_dirs']} directories")
+\`\`\``;
+            
+            displayFormattedResponse(multiLang);
+        }
+        
+        function testRawMarkdown() {
+            const rawMarkdown = document.getElementById('rawMarkdown').value;
+            displayFormattedResponse(rawMarkdown);
+        }
+        
+        function testMarkdownParsing() {
+            const fullMarkdown = `# Complete Markdown Test
+
+This is a **comprehensive test** of *markdown parsing* with \`inline code\`.
+
+## Code Blocks
+
+### Bash Example
+\`\`\`bash
+#!/bin/bash
+echo "Testing bash highlighting"
+ls -la | grep "test"
+\`\`\`
+
+### JSON Example
+\`\`\`json
+{
+  "name": "test",
+  "version": "1.0.0",
+  "dependencies": {
+    "highlight.js": "^11.9.0"
+  }
+}
+\`\`\`
+
+## Lists
+
+1. First item
+2. Second item with \`code\`
+3. Third item
+
+- Bullet point
+- Another bullet
+  - Nested bullet
+
+## Table
+
+| Language | Extension | Highlighting |
+|----------|-----------|-------------|
+| Bash     | .sh       | ✅ Yes      |
+| PHP      | .php      | ✅ Yes      |
+| Python   | .py       | ✅ Yes      |
+
+## Blockquote
+
+> This is a blockquote with **bold text** and *italic text*.
+> It should be styled nicely.
+
+---
+
+**Test completed!**`;
+            
+            displayFormattedResponse(fullMarkdown);
+        }
+        
+        function clearResponse() {
+            responseDiv.innerHTML = '<p>Response cleared. Click a test button to run a test.</p>';
+        }
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            checkLibraries();
+            console.log('🚀 Debug page initialized');
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,34 @@
+site_name: "OpenRouterApp Documentation"
+theme:
+  name: "material"
+  logo: 'assets/images/OpenRouterAppLogo.png'
+  feature:
+    - footer
+copyright: OpenRouterApp Documentation
+docs_dir: "./docs"
+extra:
+  generator: false
+nav:
+  - Home: index.md
+  - Symfony:
+    - Composer: 'symfony/composer.md'
+    - Console: 'symfony/console.md'
+    - doctrine: 'symfony/doctrine.md'
+    - scheduler: 'symfony/scheduler.md'
+    - howto: 'symfony/howtouse.md'
+  - OpenrouterApp: 
+    - How to use: 'ora/howtouse.md'
+    - Conversation: 'ora/howconversationworks.md'
+# plugins:
+#     - with-pdf: # documentation https://pypi.org/project/mkdocs-with-pdf/
+#         author: Yaël Champclaux
+#         copyright: Youls Inc. 
+#         cover: true
+#         cover_title: mptyfony Documentation
+#         cover_subtitle: 09-04-2025
+#         show_anchors: true
+
+# if you uncomment plugin: section, you'll have a pdf export of documentation 
+# in /tmp/mkdocs_57gqrjor/pdf/document.pdf of container doc-mpty when build
+# to get it locally (check path into container log) : 
+# docker cp doc-mpty:/tmp/mkdocs_57gqrjor/pdf/document.pdf ./document.pdf

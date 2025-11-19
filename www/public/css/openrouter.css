@@ -1,0 +1,971 @@
+/* openrouter.css */
+body {
+    font-family: system-ui, -apple-system, sans-serif;
+    margin: 0;
+    padding: 2rem;
+    line-height: 1.6;
+    color: #333;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+h1 {
+    color: #2c3e50;
+    margin-bottom: 1.5rem;
+}
+
+/* Modifier cette règle pour que les inputs et textareas soient à 100% mais pas tous les buttons */
+select, textarea, input[type="text"] {
+    display: block;
+    margin-top: 1rem;
+    width: 100%; /* Ces éléments prennent toute la largeur */
+    padding: 0.8rem;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+    font-family: inherit;
+}
+
+/* Styles généraux pour les boutons */
+button {
+    padding: 0.8rem; /* Appliquer le padding ici */
+    border-radius: 4px; /* Appliquer le border-radius ici */
+    border: 1px solid #ddd; /* Appliquer la bordure ici par défaut */
+    font-family: inherit;
+    display: inline-block; /* Les rendre inline-block par défaut */
+    width: auto; /* width auto par défaut pour les boutons */
+    background-color: #3498db;
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.2s ease;
+}
+
+button:hover {
+    background-color: #2980b9;
+}
+
+/* Nouveau style pour le bouton "New Conversation" */
+.new-conversation-button {
+    background-color: #e74c3c; /* Rouge */
+    color: white;
+    /* Conserve les propriétés de 'button' par défaut pour padding, border-radius, etc. */
+    border: 1px solid #e9ecef; /* Bordure pour correspondre aux liens */
+}
+
+.new-conversation-button:hover {
+    background-color: #c0392b; /* Rouge plus foncé au survol */
+}
+
+#model-description {
+    margin-top: 0.8rem;
+    white-space: pre-wrap;
+    color: #666;
+    padding: 0.8rem;
+    background: #f8f9fa;
+    border-radius: 4px;
+    font-size: 0.9rem;
+}
+
+.radio-group {
+    margin: 1.2rem 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.checkbox-group {
+    margin-bottom: 1.2rem;
+}
+
+.tabs {
+    display: flex;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #ddd;
+}
+
+.tab-btn {
+    padding: 10px 20px;
+    background: #f0f0f0;
+    border: 1px solid #ddd;
+    border-bottom: none;
+    cursor: pointer;
+    margin-right: 5px;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    width: auto;
+}
+
+.tab-btn.active {
+    background: #fff;
+    border-bottom-color: #fff;
+    position: relative;
+    z-index: 1;
+}
+
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+.navigation {
+    margin: 1rem 0;
+    display: flex; /* Utilisation de flexbox pour aligner les éléments */
+    flex-wrap: wrap; /* Permettre le retour à la ligne sur les petits écrans */
+    align-items: center; /* Centrer verticalement les éléments */
+    gap: 0.5rem; /* Espacement entre les éléments */
+}
+
+/* Cette règle applique le style "link-like" aux a et aux boutons avec navigation-link */
+.navigation a,
+.navigation button.navigation-link {
+    display: inline-block; /* Assure qu'ils sont en ligne */
+    padding: 0.5rem 1rem; /* Padding spécifique pour les liens de navigation */
+    background-color: #f8f9fa;
+    color: #3498db;
+    text-decoration: none;
+    border-radius: 4px;
+    border: 1px solid #e9ecef;
+    width: auto; /* S'assurer qu'ils ne prennent pas 100% de la largeur */
+    box-sizing: border-box; /* Inclure padding et border dans la largeur */
+}
+
+.navigation a:hover,
+.navigation button.navigation-link:hover {
+    background-color: #e9ecef;
+}
+
+/* History page styles */
+.history-container {
+    margin-top: 1.5rem;
+}
+
+.history-item {
+    margin: 1.5rem 0;
+    padding: 1.2rem;
+    border: 1px solid #e9ecef;
+    border-radius: 6px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    background: white;
+}
+
+.model {
+    font-weight: bold;
+    color: #2c3e50;
+}
+
+.prompt, .response {
+    margin: 1rem 0;
+    padding: 1rem;
+    border-radius: 4px;
+}
+
+.prompt {
+    background-color: #f8f9fa;
+    border: 1px solid #e9ecef;
+}
+
+.response {
+    background-color: #ebf5ff;
+    border: 1px solid #d0e3ff;
+}
+
+.timestamp {
+    color: #6c757d;
+    font-size: 0.85rem;
+}
+
+/* History selector */
+.history-selector {
+    width: 100%;
+    padding: 0.8rem;
+    margin-bottom: 1.5rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.no-history {
+    padding: 2rem;
+    text-align: center;
+    color: #6c757d;
+    background-color: #f8f9fa;
+    border-radius: 4px;
+    margin-top: 2rem;
+}
+
+@media (max-width: 768px) {
+    body {
+        padding: 1rem;
+    }
+    
+    .radio-group {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    .navigation {
+        flex-direction: column; /* Empile les éléments verticalement sur petits écrans */
+        align-items: flex-start; /* Aligne à gauche */
+    }
+    .navigation a, 
+    .navigation button.navigation-link,
+    .new-conversation-button { 
+        margin: 0.2rem 0; /* Ajuste la marge pour l'empilement vertical */
+        width: 100%; /* S'étend sur toute la largeur disponible */
+    }
+}
+
+/* Styles pour la boîte de dialogue de titre */
+.title-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.title-modal-content {
+    background: white;
+    padding: 25px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    text-align: center;
+    max-width: 400px;
+    width: 90%;
+}
+
+.title-modal-content label {
+    display: block;
+    margin-bottom: 15px;
+    font-size: 1.em;
+    color: #333;
+    font-weight: bold;
+}
+
+.title-modal-content input[type="text"] {
+    width: calc(100% - 20px);
+    padding: 10px;
+    margin-bottom: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 1em;
+}
+
+.title-modal-buttons button {
+    background-color: #4CAF50; /* Green */
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1em; /* Utiliser em pour une meilleure adaptabilité */
+    margin: 0 8px;
+    transition: background-color 0.2s ease;
+    width: auto; /* Override 100% width for buttons */
+    /* display: inline-block; <-- Already set in global button rule */
+}
+
+.title-modal-buttons button.cancel-button {
+    background-color: #f44336; /* Red */
+}
+
+.title-modal-buttons button:hover {
+    opacity: 0.9;
+}
+
+/* upload button */
+.chat-input-container {
+    display: flex;
+    flex-direction: column;
+}
+
+.input-buttons {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+#upload-file-button {
+    background-color: #3498db;
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+#upload-file-button:hover {
+    background-color: #2980b9;
+}
+
+/* Base styles for the response container */
+.response {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+    line-height: 1.6;
+    color: #e4e4e7;
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    border-radius: 12px;
+    padding: 24px;
+    margin: 20px 0;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    max-width: 100%;
+    overflow-x: auto;
+    min-height: 50px;
+}
+
+/* Typography Enhancements */
+.response h1 {
+    color: #60a5fa;
+    border-bottom: 2px solid #3b82f6;
+    padding-bottom: 8px;
+    margin-bottom: 20px;
+    font-size: 1.8em;
+    font-weight: 600;
+}
+
+.response h2 {
+    color: #34d399;
+    margin-top: 24px;
+    margin-bottom: 16px;
+    font-size: 1.4em;
+    font-weight: 500;
+    position: relative;
+}
+
+.response h2::before {
+    content: "▶";
+    color: #10b981;
+    margin-right: 8px;
+    font-size: 0.8em;
+}
+
+.response h3 {
+    color: #fbbf24;
+    margin-top: 20px;
+    margin-bottom: 12px;
+    font-size: 1.2em;
+    font-weight: 500;
+}
+
+.response h4, .response h5, .response h6 {
+    color: #a78bfa;
+    margin-top: 16px;
+    margin-bottom: 8px;
+}
+
+/* Paragraph styling */
+.response p {
+    margin-bottom: 16px;
+    text-align: justify;
+    color: #d1d5db;
+}
+
+/* List styling */
+.response ul, .response ol {
+    margin-bottom: 16px;
+    padding-left: 24px;
+}
+
+.response li {
+    margin-bottom: 8px;
+    color: #d1d5db;
+}
+
+.response ul li::marker {
+    color: #60a5fa;
+}
+
+.response ol li::marker {
+    color: #34d399;
+    font-weight: bold;
+}
+
+/* Enhanced Code Blocks */
+.response pre {
+    background: #0d1117 !important;
+    border: 1px solid #30363d;
+    border-radius: 8px;
+    padding: 16px;
+    margin: 16px 0;
+    overflow-x: auto;
+    position: relative;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+}
+
+.response pre:hover {
+    border-color: #58a6ff;
+    transition: border-color 0.3s ease;
+}
+
+.response code {
+    font-family: 'Fira Code', 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    font-size: 0.9em;
+    line-height: 1.5;
+}
+
+/* Inline code styling */
+.response p code, .response li code, .response td code {
+    background: rgba(110, 118, 129, 0.2);
+    color: #ff7b72;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 0.85em;
+    border: 1px solid rgba(110, 118, 129, 0.3);
+}
+
+/* Enhanced Copy Button */
+.copy-code-button {
+    position: absolute !important;
+    top: 8px !important;
+    right: 8px !important;
+    background: linear-gradient(135deg, #3b82f6, #1d4ed8) !important;
+    color: white !important;
+    border: none !important;
+    padding: 6px 12px !important;
+    border-radius: 6px !important;
+    cursor: pointer !important;
+    font-size: 0.8em !important;
+    font-weight: 500 !important;
+    transition: all 0.2s ease !important;
+    z-index: 10 !important;
+    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3) !important;
+}
+
+.copy-code-button:hover {
+    background: linear-gradient(135deg, #2563eb, #1e40af) !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4) !important;
+}
+
+.copy-code-button:active {
+    transform: translateY(0) !important;
+}
+
+/* Blockquotes */
+.response blockquote {
+    border-left: 4px solid #3b82f6;
+    background: rgba(59, 130, 246, 0.1);
+    margin: 16px 0;
+    padding: 12px 16px;
+    border-radius: 0 8px 8px 0;
+    font-style: italic;
+    color: #cbd5e1;
+}
+
+/* Tables */
+.response table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 16px 0;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.response th, .response td {
+    padding: 12px 16px;
+    text-align: left;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.response th {
+    background: rgba(59, 130, 246, 0.2);
+    color: #60a5fa;
+    font-weight: 600;
+}
+
+.response tr:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+/* Links */
+.response a {
+    color: #60a5fa;
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+    transition: all 0.2s ease;
+}
+
+.response a:hover {
+    color: #93c5fd;
+    border-bottom-color: #60a5fa;
+}
+
+/* Strong and emphasis */
+.response strong {
+    color: #fbbf24;
+    font-weight: 600;
+}
+
+.response em {
+    color: #a78bfa;
+    font-style: italic;
+}
+
+/* Horizontal rule */
+.response hr {
+    border: none;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #3b82f6, transparent);
+    margin: 24px 0;
+}
+
+/* Loading state */
+.response.loading {
+    background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+    position: relative;
+    overflow: hidden;
+}
+
+.response.loading::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.2), transparent);
+    animation: loading-shimmer 2s infinite;
+}
+
+@keyframes loading-shimmer {
+    0% { left: -100%; }
+    100% { left: 100%; }
+}
+
+/* Code language indicator */
+.response pre[data-language]::before {
+    content: attr(data-language);
+    position: absolute;
+    top: 8px;
+    left: 16px;
+    background: rgba(59, 130, 246, 0.8);
+    color: white;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.75em;
+    font-weight: 500;
+    text-transform: uppercase;
+    z-index: 5;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .response {
+        padding: 16px;
+        margin: 12px 0;
+        border-radius: 8px;
+    }
+    
+    .response pre {
+        padding: 12px;
+        margin: 12px 0;
+    }
+    
+    .copy-code-button {
+        padding: 4px 8px !important;
+        font-size: 0.7em !important;
+    }
+    
+    .response h1 {
+        font-size: 1.5em;
+    }
+    
+    .response h2 {
+        font-size: 1.3em;
+    }
+    
+    .response h3 {
+        font-size: 1.1em;
+    }
+}
+
+/* Dark mode enhancements for existing elements */
+body {
+    background: #0f172a;
+    color: #e2e8f0;
+}
+
+/* Amélioration Chat input container */
+.chat-input-container {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    padding: 16px;
+    margin: 16px 0;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    width: 100%; /* Adjust as needed */
+    box-sizing: border-box; /* Include padding and border in the element's total width */
+}
+
+#chat-title {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 6px;
+    color: #e2e8f0;
+    padding: 12px;
+    font-family: inherit;
+    width: 100%; /* Ensure the input spans the full width of its container */
+    box-sizing: border-box; /* Include padding and border in the element's total width */
+    display: block; /* Ensure the input is a block-level element */
+    margin: 0 10 0 0; /* Reset any default margin */
+}
+
+/* Amélioration Textarea */
+
+#prompt {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 6px;
+    color: #e2e8f0;
+    padding: 12px;
+    font-family: inherit;
+    width: 100%; /* Ensure the textarea spans the full width of its container */
+    box-sizing: border-box; /* Include padding and border in the element's total width */
+    resize: vertical; /* Allow vertical resizing of the textarea */
+}
+
+/* Amélioration Button */
+button {
+    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+    border: none;
+    border-radius: 6px;
+    color: white;
+    padding: 8px 16px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-top: 10px; /* Add some spacing between the textarea and the button */
+}
+
+button:hover {
+    background: linear-gradient(135deg, #2563eb, #1e40af);
+    transform: translateY(-1px);
+}
+
+/* Amélioration Select */
+select {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 6px;
+    color: #f1f5f9; /* Couleur beaucoup plus claire et visible */
+    padding: 12px 16px;
+    font-size: 14px;
+    font-weight: 500;
+    width: 100%;
+    box-sizing: border-box;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+select:focus {
+    border-color: #60a5fa;
+    outline: none;
+    background: rgba(255, 255, 255, 0.15);
+    box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.1);
+}
+
+select:hover {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.4);
+}
+
+/* Options du select avec meilleure visibilité */
+select option {
+    background-color: #1e293b; /* Fond sombre pour les options */
+    color: #f1f5f9; /* Texte clair */
+    padding: 8px 12px;
+    font-weight: 500;
+    border: none;
+}
+
+select option:hover,
+select option:focus {
+    background-color: #334155; /* Fond plus clair au survol */
+    color: #ffffff; /* Texte encore plus clair */
+}
+
+select option:checked {
+    background-color: #3b82f6; /* Bleu pour l'option sélectionnée */
+    color: #ffffff;
+    font-weight: 600;
+}
+
+/* Pour les navigateurs WebKit (Chrome, Safari) */
+select::-webkit-scrollbar {
+    width: 8px;
+}
+
+select::-webkit-scrollbar-track {
+    background: #1e293b;
+}
+
+select::-webkit-scrollbar-thumb {
+    background: #475569;
+    border-radius: 4px;
+}
+
+select::-webkit-scrollbar-thumb:hover {
+    background: #64748b;
+}
+
+/* Style spécifique pour le select des modèles */
+/* Correction définitive pour le contraste du select */
+/* À remplacer dans openrouter.css */
+
+#model {
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(29, 78, 216, 0.1));
+    border: 2px solid rgba(59, 130, 246, 0.3);
+    color: #e2e8f0 !important; /* Texte très clair */
+    font-weight: 600;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+    padding: 12px 16px;
+    font-size: 14px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+#model:focus {
+    border-color: #60a5fa;
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(29, 78, 216, 0.2));
+    color: #f8fafc !important;
+}
+
+/* Options avec contraste maximal */
+#model option {
+    background-color: #0f172a !important; /* Fond très sombre */
+    color: #f1f5f9 !important; /* Texte très clair */
+    font-weight: 500 !important;
+    padding: 12px 16px !important;
+    line-height: 1.6 !important;
+    border: none !important;
+}
+
+/* Au survol - FOND SOMBRE avec TEXTE BLANC */
+#model option:hover {
+    background-color: #1e293b !important; /* Fond sombre */
+    color: #ffffff !important; /* Texte blanc pur */
+    font-weight: 600 !important;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8) !important;
+}
+
+/* Option sélectionnée */
+#model option:checked,
+#model option:focus,
+#model option[selected] {
+    background-color: #3b82f6 !important; /* Bleu */
+    color: #ffffff !important; /* Texte blanc */
+    font-weight: 700 !important;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5) !important;
+}
+
+/* Pour forcer sur tous les navigateurs */
+select option:hover,
+select option:focus {
+    background: #1e293b !important;
+    color: #ffffff !important;
+}
+
+/* Styles spécifiques pour différents navigateurs */
+@-moz-document url-prefix() {
+    /* Firefox */
+    #model option:hover {
+        background-color: #1e293b !important;
+        color: #ffffff !important;
+    }
+}
+
+/* Pour WebKit (Chrome, Safari) */
+@supports (-webkit-appearance: none) {
+    #model option:hover {
+        background: linear-gradient(to bottom, #1e293b, #0f172a) !important;
+        color: #ffffff !important;
+    }
+}
+
+
+/* Amélioration Navigation */
+.navigation a {
+    color: #60a5fa;
+    text-decoration: none;
+    padding: 8px 12px;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+.navigation a:hover {
+    background: rgba(96, 165, 250, 0.1);
+    color: #93c5fd;
+}
+
+/* Amélioration de la description du modèle pour une meilleure lisibilité */
+#model-description {
+    margin-top: 0.8rem;
+    white-space: pre-wrap;
+    color: #d1d5db; /* Plus clair que #666 */
+    padding: 1rem;
+    background: rgba(30, 41, 59, 0.5); /* Fond semi-transparent */
+    border-radius: 8px;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(5px);
+}
+
+/* Amélioration des inputs de texte */
+input[type="text"], textarea {
+    background: rgba(30, 41, 59, 0.6) !important;
+    border: 2px solid rgba(255, 255, 255, 0.2) !important;
+    border-radius: 8px !important;
+    color: #f1f5f9 !important;
+    padding: 12px 16px !important;
+    font-weight: 500 !important;
+    transition: all 0.2s ease !important;
+}
+
+input[type="text"]:focus, textarea:focus {
+    border-color: #60a5fa !important;
+    background: rgba(30, 41, 59, 0.8) !important;
+    box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.1) !important;
+    outline: none !important;
+}
+
+input[type="text"]::placeholder, textarea::placeholder {
+    color: #94a3b8 !important;
+    opacity: 0.8 !important;
+}
+
+/* Amélioration des labels et checkbox/radio */
+.radio-group label, .checkbox-group label {
+    color: #e2e8f0 !important;
+    font-weight: 500 !important;
+    cursor: pointer !important;
+    transition: color 0.2s ease !important;
+}
+
+.radio-group label:hover, .checkbox-group label:hover {
+    color: #f8fafc !important;
+}
+
+.radio-group input[type="radio"], .checkbox-group input[type="checkbox"] {
+    margin-right: 8px !important;
+    transform: scale(1.1) !important;
+    accent-color: #3b82f6 !important;
+}
+
+/* Amélioration des compteurs */
+.radio-group span, .checkbox-group span {
+    color: #94a3b8 !important;
+    font-weight: 400 !important;
+    margin-left: 4px !important;
+}
+
+/* Meilleure visibilité pour les liens de navigation */
+.navigation a, .navigation button.navigation-link {
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(29, 78, 216, 0.1)) !important;
+    color: #60a5fa !important;
+    border: 1px solid rgba(96, 165, 250, 0.3) !important;
+    font-weight: 500 !important;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3) !important;
+    backdrop-filter: blur(5px) !important;
+}
+
+.navigation a:hover, .navigation button.navigation-link:hover {
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(29, 78, 216, 0.2)) !important;
+    border-color: rgba(96, 165, 250, 0.5) !important;
+    color: #93c5fd !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2) !important;
+}
+
+/* Amélioration du bouton "New Conversation" */
+.new-conversation-button {
+    background: linear-gradient(135deg, #ef4444, #dc2626) !important;
+    color: white !important;
+    border: 1px solid rgba(239, 68, 68, 0.3) !important;
+    font-weight: 600 !important;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3) !important;
+}
+
+.new-conversation-button:hover {
+    background: linear-gradient(135deg, #dc2626, #b91c1c) !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3) !important;
+}
+
+/* Amélioration des boutons en général */
+button {
+    font-weight: 500 !important;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2) !important;
+    backdrop-filter: blur(5px) !important;
+    transition: all 0.2s ease !important;
+}
+
+button:hover {
+    transform: translateY(-1px) !important;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2) !important;
+}
+
+/* Amélioration du conteneur de saisie de chat */
+.chat-input-container {
+    background: rgba(30, 41, 59, 0.3) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    backdrop-filter: blur(10px) !important;
+}
+
+/* Meilleure visibilité pour les titres */
+h1 {
+    color: #f1f5f9 !important;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* Amélioration responsive pour les petits écrans */
+@media (max-width: 768px) {
+    select, #model {
+        font-size: 16px !important; /* Évite le zoom sur iOS */
+        padding: 14px !important;
+    }
+    
+    .radio-group, .checkbox-group {
+        font-size: 14px !important;
+    }
+    
+    .navigation a, .navigation button.navigation-link, .new-conversation-button {
+        font-size: 14px !important;
+        padding: 10px 12px !important;
+    }
+}
+
+/* Animation de chargement améliorée */
+@keyframes enhanced-loading-shimmer {
+    0% { 
+        left: -100%; 
+        opacity: 0;
+    }
+    50% { 
+        opacity: 1; 
+    }
+    100% { 
+        left: 100%; 
+        opacity: 0;
+    }
+}
+
+.response.loading::before {
+    animation: enhanced-loading-shimmer 2s infinite !important;
+}
+
+/* Amélioration de l'accessibilité */
+*:focus-visible {
+    outline: 2px solid #60a5fa !important;
+    outline-offset: 2px !important;
+    border-radius: 4px !important;
+}
