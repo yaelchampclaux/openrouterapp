@@ -1,59 +1,58 @@
-# Utilisation de l'Application OpenRouter Chat
+# Using the OpenRouter Chat Application
 
-Cette page vous guide à travers l'interface de l'application OpenRouter Chat, vous expliquant comment interagir avec les modèles d'IA et gérer vos conversations.
+This page guides you through the OpenRouter Chat application interface, explaining how to interact with AI models and manage your conversations.
 
-## Présentation de l'Interface
+## Interface Overview
 
-L'interface de l'application est conçue pour être intuitive et vous permettre de démarrer rapidement des conversations avec différents modèles d'IA.
+The application interface is designed to be intuitive and allow you to quickly start conversations with different AI models.
 
-![Schéma de l'interface OpenRouter Chat](img/chat_interface_overview.png)
-_Note: L'image ci-dessus est un placeholder. Vous pouvez la remplacer par une capture d'écran réelle de votre interface pour une meilleure compréhension._
+![OpenRouter Chat Interface Diagram](../assets/images/chat_interface_overview.png)
 
-### Éléments Clés de l'Interface
+### Key Interface Elements
 
-1.  **Navigation Principale**
-    *   **View Chat History**: Accédez à l'historique complet de toutes vos conversations passées.
-    *   **Check Status**: Vérifiez le statut actuel du service OpenRouter.ai (utile en cas de problème).
-    *   **Check Credits**: Consultez votre solde de crédits sur OpenRouter.ai.
-    *   **Check Best AI 1 / Check Best AI 2**: Liens vers des classements et comparaisons de modèles d'IA pour vous aider à choisir.
-    *   **New Conversation**: Redémarre l'interface pour une toute nouvelle conversation, effaçant le prompt actuel et la réponse.
+1.  **Main Navigation**
+    *   **View Chat History**: Access the complete history of all your past conversations.
+    *   **Check Status**: Check the current status of the OpenRouter.ai service (useful in case of issues).
+    *   **Check Credits**: Check your credit balance on OpenRouter.ai.
+    *   **Check Best AI 1 / Check Best AI 2**: Links to AI model rankings and comparisons to help you choose.
+    *   **New Conversation**: Restarts the interface for a brand new conversation, clearing the current prompt and response.
 
-2.  **Filtres de Modèles**
-    Ces options vous permettent de filtrer la liste des modèles disponibles en fonction de leur statut ou de leurs capacités.
-    *   **All**: Affiche tous les modèles disponibles.
-    *   **Free**: Affiche uniquement les modèles gratuits.
-    *   **Paid**: Affiche uniquement les modèles payants.
-    *   **Coding Models (Checkbox)**: Cochez cette case pour afficher spécifiquement les modèles optimisés pour le codage.
+2.  **Model Filters**
+    These options allow you to filter the list of available models based on their status or capabilities.
+    *   **All**: Displays all available models.
+    *   **Free**: Displays only free models.
+    *   **Paid**: Displays only paid models.
+    *   **Coding Models (Checkbox)**: Check this box to specifically display models optimized for coding.
 
-3.  **Sélection du Modèle**
-    Le menu déroulant `select id="model"` vous permet de choisir le modèle d'IA avec lequel vous souhaitez interagir. Une fois un modèle sélectionné, une brève description (si disponible) s'affichera en dessous.
+3.  **Model Selection**
+    The dropdown menu `select id="model"` allows you to choose the AI model you want to interact with. Once a model is selected, a brief description (if available) will be displayed below.
 
-4.  **Titre de la Conversation (Optionnel)**
-    `input type="text" id="chat-title"`: Avant de lancer votre première question, vous pouvez saisir un titre pour votre conversation. Si ce champ est laissé vide, un titre sera automatiquement généré à partir de votre première question. Ce titre sera utilisé pour identifier facilement la conversation dans votre historique.
+4.  **Conversation Title (Optional)**
+    `input type="text" id="chat-title"`: Before asking your first question, you can enter a title for your conversation. If this field is left empty, a title will be automatically generated from your first question. This title will be used to easily identify the conversation in your history.
 
-5.  **Zone de Saisie du Prompt**
-    `textarea id="prompt"`: C'est ici que vous tapez vos questions, commandes ou instructions pour le modèle d'IA.
+5.  **Prompt Input Area**
+    `textarea id="prompt"`: This is where you type your questions, commands, or instructions for the AI model.
 
-6.  **Bouton "Send"**
-    `button id="send-button"`: Cliquez sur ce bouton pour envoyer votre prompt au modèle d'IA sélectionné et initier ou continuer une conversation.
+6.  **"Send" Button**
+    `button id="send-button"`: Click this button to send your prompt to the selected AI model and initiate or continue a conversation.
 
-7.  **Zone de Réponse**
-    `div class="response" id="response"`: La réponse générée par le modèle d'IA s'affichera dans cette zone.
+7.  **Response Area**
+    `div class="response" id="response"`: The response generated by the AI model will be displayed in this area.
 
-## Démarrer une Nouvelle Conversation
+## Starting a New Conversation
 
-1.  **Choisissez un Modèle**: Sélectionnez le modèle d'IA que vous souhaitez utiliser dans le menu déroulant. Vous pouvez utiliser les filtres (All, Free, Paid, Coding Models) pour affiner votre choix.
-2.  **Donnez un Titre (Optionnel)**: Entrez un titre descriptif pour votre conversation dans le champ "Enter chat title (optional)".
-3.  **Écrivez votre Prompt**: Saisissez votre question ou commande dans la zone de texte prévue à cet effet.
-4.  **Envoyez**: Cliquez sur le bouton "Send".
+1.  **Choose a Model**: Select the AI model you want to use from the dropdown menu. You can use the filters (All, Free, Paid, Coding Models) to refine your choice.
+2.  **Give it a Title (Optional)**: Enter a descriptive title for your conversation in the "Enter chat title (optional)" field.
+3.  **Write Your Prompt**: Enter your question or command in the text area provided for this purpose.
+4.  **Send**: Click the "Send" button.
 
-Votre première question lancera une nouvelle conversation. La réponse du modèle apparaîtra dans la zone de réponse.
+Your first question will start a new conversation. The model's response will appear in the response area.
 
-## Continuer une Conversation
+## Continuing a Conversation
 
-Une fois une conversation démarrée, chaque nouveau prompt que vous envoyez via la zone de texte et le bouton "Send" sera ajouté à la même conversation. Le modèle aura accès à l'historique complet de cette conversation pour contextualiser ses réponses.
+Once a conversation is started, each new prompt you send via the text area and the "Send" button will be added to the same conversation. The model will have access to the complete history of this conversation to contextualize its responses.
 
-## Gérer les Conversations
+## Managing Conversations
 
-*   **Nouvelle Conversation**: Si vous souhaitez démarrer une conversation sans lien avec la précédente, cliquez sur le bouton "New Conversation". Cela effacera l'interface actuelle et vous permettra de commencer de zéro.
-*   **Historique des Chats**: Vous pouvez consulter toutes vos conversations passées en cliquant sur "View Chat History". Chaque conversation sera listée avec son titre et vous pourrez y accéder pour revoir les échanges.
+*   **New Conversation**: If you want to start a conversation unrelated to the previous one, click the "New Conversation" button. This will clear the current interface and allow you to start from scratch.
+*   **Chat History**: You can view all your past conversations by clicking "View Chat History". Each conversation will be listed with its title and you can access it to review the exchanges.

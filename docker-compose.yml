@@ -1,10 +1,15 @@
 networks: 
   openrouterappnetwork:
     driver: bridge
+
+secrets:
+  db_root_password:
+    file: ./db_root_password.txt
+
 services:
-#MariaDB /run/secrets/db_root_password
+  # MariaDB
   db:
-    container_name: db-ora2
+    container_name: db-ora
     restart: unless-stopped
     image: mariadb:11.6
     networks:
@@ -12,48 +17,68 @@ services:
     ports:
       - "3508:3306"
     volumes:
-      - ./db:/var/lib/mariadb
+      - db:/var/lib/mysql
+    secrets:
+      - db_root_password
     environment:
-      MARIADB_ROOT_PASSWORD: openrouterappdbrootpassword
+      MARIADB_ROOT_PASSWORD_FILE: /run/secrets/db_root_password
       MARIADB_DATABASE: openrouterapp
-#Phpmyadmin /run/secrets/db_root_password
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  # PhpMyAdmin
   phpmyadmin:
     image: phpmyadmin/phpmyadmin:latest
-    container_name: pma-ora2
-    restart: always
+    container_name: pma-ora
+    restart: unless-stopped
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     ports:
       - "9311:80"
+    secrets:
+      - db_root_password
     environment:
-      MARIADB_ROOT_PASSWORD: openrouterappdbrootpassword
+      PMA_HOST: db
+      PMA_PORT: 3306
+      MYSQL_ROOT_PASSWORD_FILE: /run/secrets/db_root_password
       UPLOAD_LIMIT: 64M
       PHP_UPLOAD_MAX_FILESIZE: 64M
       PHP_POST_MAX_SIZE: 64M
-
     networks:
       - openrouterappnetwork
-#PHP
+
+ # PHP
   www:
     user: you
     build: ./docker/php
-    container_name: www-ora2
+    container_name: www-ora
+    restart: unless-stopped
     networks:
       - openrouterappnetwork
     volumes:
-      - ./www:/home/you/openrouterapp
+      - ./www:/home/you/ora
     ports:
-      - 9310:8800
+      - "9310:8800"
     environment:
       SHELL_VERBOSITY: DEBUG
+    depends_on:
+      db:
+        condition: service_healthy
     healthcheck:
       test: ["CMD", "php", "-v"]
-      interval: 5s
+      interval: 10s
       timeout: 3s
-      retries: 12
+      retries: 3
+      start_period: 10s
+
 #Mkdocs      
   mkdocs:
-    container_name: doc-ora2
+    container_name: doc-ora
     build: ./docker/mkdocs
     ports:
       - "9312:8000"
@@ -64,6 +89,7 @@ services:
     restart: unless-stopped
     networks:
       - openrouterappnetwork
+
 #Symfony
   database:
     image: postgres:${POSTGRES_VERSION:-16}-alpine
@@ -81,8 +107,7 @@ services:
       - database_data:/var/lib/postgresql/data:rw
     ports:
       - "5432"
+
 volumes:
   db:
-  www:
-  mkdocs:
   database_data:

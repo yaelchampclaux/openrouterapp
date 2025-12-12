@@ -9,16 +9,16 @@ docs_dir: "./docs"
 extra:
   generator: false
 nav:
-  - Home: index.md
-  - Symfony:
-    - Composer: 'symfony/composer.md'
-    - Console: 'symfony/console.md'
-    - doctrine: 'symfony/doctrine.md'
-    - scheduler: 'symfony/scheduler.md'
-    - howto: 'symfony/howtouse.md'
+  - Installation: index.md
   - OpenrouterApp: 
     - How to use: 'ora/howtouse.md'
     - Conversation: 'ora/howconversationworks.md'
+  - Development:
+    - Manual Installation : symfony/install.md
+    - Composer: 'symfony/composer.md'
+    - Console: 'symfony/console.md'
+    - Doctrine: 'symfony/doctrine.md'
+
 # plugins:
 #     - with-pdf: # documentation https://pypi.org/project/mkdocs-with-pdf/
 #         author: Yaël Champclaux

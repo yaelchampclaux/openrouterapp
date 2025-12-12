@@ -45,3 +45,17 @@ It will provide a list of outdated recipes, you can choose which one to update
 If an update failed, or the recipe is broken, you can still reinstall it 
 
 `../composer.phar recipes:install easycorp/easyadmin-bundle --force`
+
+## Migration from Symfony 7.3.7 to 7.4 example
+
+# Modify composer.json pour autorize 7.4
+sed -i 's/"^7\.2"/"^7.4"/g' composer.json
+
+# Update
+../composer.phar update symfony/* --with-all-dependencies
+
+# Update recipes
+../composer.phar recipes:update
+
+# Clear cache
+bin/console cache:clear

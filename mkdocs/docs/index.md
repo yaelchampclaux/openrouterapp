@@ -1,22 +1,60 @@
-# Documentation
+# OpenRouterApplication Installation
 
-This is the home page of the documentation for OpenRouterApp. 
-openrouterapp is a symfony project.
+## Prerequisites
+* **Linux/WSL:** Docker and Docker Compose
+* **Windows/Mac:** Docker Desktop
 
-## OpenRouterApp DEV Architecture
+## Quick Installation
 
-OpenRouterApp is a containerized Symfony application, using PHP 8.3 and MariaDB 11.6.2
+1 **Clone the project**
+```bash
+   git clone yaelchampclaux/openrouterapplication
+   cd openrouterapplication
+```
 
-It also has a Documentation (mkdocs) and a database admin Tool (Phpmyadmin).
+2 **Checkout to dev**
+```bash
+   git checkout dev
+   git pull
+```
 
-![Picture of OpenRouterApp architecture](./assets/images/Architecture.png "Schema of the 4 containers of OpenRouterApp")
+3 **Run the automatic installation**
+```bash
+   ./start.sh
+```
+   
+    The script will:
 
-## Access to OpenRouterApp Website, PhpmyAdmin and Documentation
+    - Check prerequisites
+    - Ask you for a database password
+    - Automatically configure all files
+    - Start the containers
+    - Install Symfony dependencies
+    - Create the database structure
 
+4 **Access the services**
 
+   - Symfony Application: http://localhost:9310
+   - PhpMyAdmin: http://localhost:9311
+   - Documentation: http://localhost:9312
 
+## Useful Commands
+```bash
+./start.sh          # Start the environment
+./stop.sh           # Stop the environment
+./start.sh --reset  # Completely reset
+./start.sh --help   # Display help
+```
 
-Le container PHP est nommé www-ora et est accessible via http://localhost:9210
-Le container phpMyAdmin est nommé pma-ora et est accessible via http://localhost:9211
-Le container documentation est nommé doc-ora et est accessible via http://localhost:9212
-Le container MariaDB est nommé db-ora
+## Common Issues
+
+**Containers won't start:**
+```bash
+./start.sh --reset
+./start.sh
+```
+
+**View logs:**
+```bash
+docker-compose logs -f
+```

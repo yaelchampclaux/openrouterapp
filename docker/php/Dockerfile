@@ -1,29 +1,50 @@
 FROM php:8.3-cli
+
+# Créer l'utilisateur
 RUN useradd -ms /bin/bash you
 
+# Installation des dépendances système
 RUN apt-get update && apt-get install -y \
-        vim \
-        git \
-        zip \
-		unzip \
-        supervisor \
-        libfreetype6-dev \
-        libjpeg62-turbo-dev \
-        libpng-dev \
-		libonig-dev \
-        libxml2-dev \
-        libzip-dev \
+    vim \
+    git \
+    zip \
+    unzip \
+    supervisor \
+    libfreetype6-dev \
+    libjpeg62-turbo-dev \
+    libpng-dev \
+    libonig-dev \
+    libxml2-dev \
+    libzip-dev \
+    libicu-dev \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install -j$(nproc) pdo gd iconv mysqli pdo_mysql zip intl \ 
-    && apt-get clean; rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /usr/share/doc/*
+    && docker-php-ext-install -j$(nproc) \
+        pdo \
+        pdo_mysql \
+        mysqli \
+        gd \
+        iconv \
+        zip \
+        intl \
+        opcache \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /usr/share/doc/*
 
+# Configuration PHP optimisée pour Symfony
+RUN echo "memory_limit = 512M" > /usr/local/etc/php/conf.d/symfony.ini \
+    && echo "opcache.enable = 1" >> /usr/local/etc/php/conf.d/symfony.ini \
+    && echo "opcache.memory_consumption = 256" >> /usr/local/etc/php/conf.d/symfony.ini \
+    && echo "opcache.max_accelerated_files = 20000" >> /usr/local/etc/php/conf.d/symfony.ini \
+    && echo "opcache.validate_timestamps = 1" >> /usr/local/etc/php/conf.d/symfony.ini \
+    && echo "realpath_cache_size = 4096K" >> /usr/local/etc/php/conf.d/symfony.ini \
+    && echo "realpath_cache_ttl = 600" >> /usr/local/etc/php/conf.d/symfony.ini
+
+# Installation de Composer (en tant que root, dans /usr/local/bin)
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+
+# Changer vers l'utilisateur you
 USER you
 WORKDIR /home/you
-# Composer (composer.phar) installation
-RUN curl -sS https://getcomposer.org/installer -o composer-setup.php
-RUN php -r "if (hash_file('sha384', 'composer-setup.php') === 'dac665fdc30fdd8ec78b38b9800061b4150413ff2e3b6f88543c636f7cd84f6db9189d43a81e5503cda447da73c7e5b6') { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;"
-RUN php composer-setup.php
-RUN php -r "unlink('composer-setup.php');"
 
 # Serveur php symfony
-CMD [ "php", "-S", "0.0.0.0:8800", "-t", "openrouterapp/public" ]
+CMD [ "php", "-S", "0.0.0.0:8800", "-t", "ora/public" ]

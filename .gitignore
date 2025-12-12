@@ -1,0 +1,77 @@
+###> Secrets & Passwords ###
+db_root_password.txt
+postgres_password.txt
+*.secret
+*.key
+!public.key
+
+###> Symfony ###
+www/.env.local
+www/.env.local.php
+www/.env.*.local
+www/config/secrets/prod/prod.decrypt.private.php
+www/public/bundles/
+www/var/
+www/vendor/
+
+###> PHPUnit ###
+www/phpunit.xml
+www/.phpunit.result.cache
+
+###> symfony/webpack-encore-bundle ###
+www/node_modules/
+www/public/build/
+www/npm-debug.log
+www/yarn-error.log
+
+###> lexik/jwt-authentication-bundle ###
+www/config/jwt/*.pem
+
+###> symfony/asset-mapper ###
+www/public/assets/
+!www/public/assets/.gitkeep
+
+###> Uploads ###
+www/public/uploads/
+!www/public/uploads/.gitkeep
+www/public/media/
+
+###> Docker ###
+docker-compose.override.yml
+/db/
+
+###> MkDocs ###
+mkdocs/site/
+mkdocs/.cache/
+
+###> IDE ###
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+*.sublime-project
+*.sublime-workspace
+
+###> OS ###
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+###> Logs ###
+*.log
+
+###> PHP ###
+.php_cs.cache
+.php-cs-fixer.cache
+
+###> Testing ###
+coverage/
+
+###> Database backups ###
+*.backup.sql
+*.backup.sql.zip

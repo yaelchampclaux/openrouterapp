@@ -1,58 +1,58 @@
-# Comment les Conversations Fonctionnent-elles ?
+# How Do Conversations Work?
 
-Cette section explique la logique sous-jacente à la gestion des conversations dans l'application OpenRouter Chat, de la création à la persistance et à la continuation.
+This section explains the underlying logic behind conversation management in the OpenRouter Chat application, from creation to persistence and continuation.
 
-## Concepts Clés
+## Key Concepts
 
-Dans cette application, une "conversation" n'est pas seulement une série d'échanges, mais une entité structurée qui maintient le contexte et l'historique.
+In this application, a "conversation" is not just a series of exchanges, but a structured entity that maintains context and history.
 
-*   **Conversation**: Représentée par l'entité `App\Entity\Conversation`. Elle regroupe une série de messages et est caractérisée par un `id` unique, un `title` (titre), une date de création (`createdAt`), et le `modelId` du modèle d'IA utilisé pour cette conversation.
-*   **Message**: Représenté par l'entité `App\Entity\Message`. Chaque message appartient à une conversation spécifique et contient son `content` (le texte), son `role` ('user' pour vous ou 'assistant' pour l'IA), et sa date de création (`createdAt`).
-*   **Contexte**: Pour qu'un modèle d'IA puisse répondre de manière pertinente, il a besoin de se souvenir des échanges précédents. Le "contexte" d'une conversation est l'ensemble de tous les messages (utilisateur et assistant) qui ont eu lieu dans cette conversation, présentés dans l'ordre chronologique.
+*   **Conversation**: Represented by the `App\Entity\Conversation` entity. It groups a series of messages and is characterized by a unique `id`, a `title`, a creation date (`createdAt`), and the `modelId` of the AI model used for this conversation.
+*   **Message**: Represented by the `App\Entity\Message` entity. Each message belongs to a specific conversation and contains its `content` (the text), its `role` ('user' for you or 'assistant' for the AI), and its creation date (`createdAt`).
+*   **Context**: For an AI model to respond relevantly, it needs to remember previous exchanges. The "context" of a conversation is the set of all messages (user and assistant) that occurred in that conversation, presented in chronological order.
 
-## Cycle de Vie d'une Conversation
+## Conversation Lifecycle
 
-### 1. Démarrer une Nouvelle Conversation
+### 1. Starting a New Conversation
 
-Lorsque vous initiez votre toute première question après avoir cliqué sur "New Conversation" ou lors du chargement initial de la page:
+When you initiate your very first question after clicking "New Conversation" or during the initial page load:
 
-1.  **Envoi du Prompt Initial**: Vous saisissez un prompt et potentiellement un titre pour le chat, puis cliquez sur "Send".
-2.  **Création de l'Entité `Conversation`**:
-    *   Le `ChatController` reçoit votre requête sur l'endpoint `/chat/start`.
-    *   Il utilise le `ConversationService::createConversation()` pour créer une nouvelle instance de `Conversation`.
-    *   Si vous avez fourni un titre, il est utilisé. Sinon, le `ConversationService` génère un titre par défaut basé sur les 50 premiers caractères de votre prompt initial.
-    *   Votre prompt initial est enregistré comme le premier `Message` (`role: 'user'`) dans cette nouvelle conversation.
-3.  **Envoi à OpenRouter**: Le `ConversationService` prépare un tableau de messages (contenant uniquement votre prompt initial) et l'envoie à l'API OpenRouter via l'`OpenRouterService`.
-4.  **Réception de la Réponse et Enregistrement**:
-    *   La réponse de l'IA est reçue.
-    *   Cette réponse est enregistrée comme un nouveau `Message` (`role: 'assistant'`) dans la même `Conversation`.
-    *   De plus, un enregistrement est créé dans l'`App\Entity\ChatHistory` (pour l'affichage global de l'historique) avec le prompt, la réponse, le modèle et le titre de la conversation.
-5.  **Affichage de la Réponse**: La réponse de l'IA est affichée dans l'interface utilisateur et l'ID de la nouvelle conversation est renvoyé au frontend pour les requêtes futures.
+1.  **Sending the Initial Prompt**: You enter a prompt and potentially a title for the chat, then click "Send".
+2.  **Creating the `Conversation` Entity**:
+    *   The `ChatController` receives your request on the `/chat/start` endpoint.
+    *   It uses `ConversationService::createConversation()` to create a new `Conversation` instance.
+    *   If you provided a title, it is used. Otherwise, the `ConversationService` generates a default title based on the first 50 characters of your initial prompt.
+    *   Your initial prompt is saved as the first `Message` (`role: 'user'`) in this new conversation.
+3.  **Sending to OpenRouter**: The `ConversationService` prepares an array of messages (containing only your initial prompt) and sends it to the OpenRouter API via the `OpenRouterService`.
+4.  **Receiving the Response and Recording**:
+    *   The AI's response is received.
+    *   This response is saved as a new `Message` (`role: 'assistant'`) in the same `Conversation`.
+    *   Additionally, a record is created in `App\Entity\ChatHistory` (for global history display) with the prompt, response, model, and conversation title.
+5.  **Displaying the Response**: The AI's response is displayed in the user interface and the new conversation ID is returned to the frontend for future requests.
 
-### 2. Continuer une Conversation Existante
+### 2. Continuing an Existing Conversation
 
-Chaque fois que vous envoyez un nouveau prompt après avoir déjà reçu une réponse dans la même session (sans avoir cliqué sur "New Conversation"):
+Each time you send a new prompt after already receiving a response in the same session (without clicking "New Conversation"):
 
-1.  **Envoi du Nouveau Prompt**: Votre nouveau prompt est envoyé à l'endpoint `/chat/continue/{conversationId}`. L'`conversationId` est l'ID de la conversation en cours, récupéré suite à la création initiale de la conversation.
-2.  **Ajout du Nouveau Message Utilisateur**:
-    *   Le `ChatController` trouve la `Conversation` correspondante via son `id`.
-    *   Le `ConversationService::continueConversation()` ajoute votre nouveau prompt comme un `Message` (`role: 'user'`) à cette conversation existante.
-3.  **Récupération du Contexte Complet**:
-    *   Le `ConversationService::getConversationContext()` est appelé. Cette méthode récupère *tous* les messages (utilisateur et assistant) associés à cette `Conversation` depuis la base de données.
-    *   **C'est cette étape qui assure la "mémoire" de la conversation.** Tous les messages sont triés par date de création pour maintenir l'ordre chronologique et sont formatés de manière à être envoyés à l'API OpenRouter (un tableau d'objets `{'role': 'user/assistant', 'content': '...'}`).
-4.  **Envoi à OpenRouter avec Contexte**: L'`OpenRouterService` envoie l'ensemble du contexte historique des messages au modèle d'IA sélectionné. Le modèle utilise ce contexte pour générer une réponse cohérente.
-5.  **Réception de la Réponse et Enregistrement**:
-    *   La réponse de l'IA est reçue.
-    *   Elle est enregistrée comme un nouveau `Message` (`role: 'assistant'`) dans la `Conversation` actuelle.
-    *   Comme précédemment, un enregistrement est ajouté à `ChatHistory` pour la persistance et la consultation facile.
-6.  **Affichage de la Réponse**: La réponse de l'IA est affichée à l'utilisateur.
+1.  **Sending the New Prompt**: Your new prompt is sent to the `/chat/continue/{conversationId}` endpoint. The `conversationId` is the ID of the current conversation, retrieved following the initial conversation creation.
+2.  **Adding the New User Message**:
+    *   The `ChatController` finds the corresponding `Conversation` via its `id`.
+    *   The `ConversationService::continueConversation()` adds your new prompt as a `Message` (`role: 'user'`) to this existing conversation.
+3.  **Retrieving the Complete Context**:
+    *   The `ConversationService::getConversationContext()` is called. This method retrieves *all* messages (user and assistant) associated with this `Conversation` from the database.
+    *   **This is the step that ensures the conversation's "memory".** All messages are sorted by creation date to maintain chronological order and are formatted to be sent to the OpenRouter API (an array of objects `{'role': 'user/assistant', 'content': '...'}`).
+4.  **Sending to OpenRouter with Context**: The `OpenRouterService` sends the entire historical message context to the selected AI model. The model uses this context to generate a coherent response.
+5.  **Receiving the Response and Recording**:
+    *   The AI's response is received.
+    *   It is saved as a new `Message` (`role: 'assistant'`) in the current `Conversation`.
+    *   As before, a record is added to `ChatHistory` for persistence and easy consultation.
+6.  **Displaying the Response**: The AI's response is displayed to the user.
 
-## Persistance et Historique
+## Persistence and History
 
-Toutes les conversations et leurs messages sont stockés dans une base de données.
+All conversations and their messages are stored in a database.
 
-*   L'`App\Entity\Conversation` stocke les informations de base de la conversation (ID, titre, modèle, date de création).
-*   L'`App\Entity\Message` stocke chaque tour de parole (votre prompt et la réponse de l'IA) et est lié à une `Conversation`.
-*   L'`App\Entity\ChatHistory` est une table séparée qui garde une trace simplifiée de chaque échange Q/R individuel, ce qui facilite l'affichage de l'historique global des requêtes et réponses, même si elles font partie de conversations plus longues.
+*   `App\Entity\Conversation` stores the basic conversation information (ID, title, model, creation date).
+*   `App\Entity\Message` stores each turn of speech (your prompt and the AI's response) and is linked to a `Conversation`.
+*   `App\Entity\ChatHistory` is a separate table that keeps a simplified trace of each individual Q&A exchange, making it easy to display the global history of requests and responses, even if they are part of longer conversations.
 
-Cette architecture garantit que vos conversations sont stockées de manière durable et que le modèle d'IA peut toujours accéder à l'historique complet des échanges pour maintenir la contextualité.
+This architecture ensures that your conversations are stored durably and that the AI model can always access the complete exchange history to maintain contextuality.
