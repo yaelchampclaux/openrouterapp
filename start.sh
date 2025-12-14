@@ -109,7 +109,7 @@ wait_for_containers() {
 install_symfony_dependencies() {
     print_message "Installation des dépendances Symfony..."
     
-    docker exec -u you www-ora bash -c "cd ora && ../composer.phar install --no-interaction"
+    docker exec -u you www-ora bash -c "cd ora && composer install --no-interaction"
     
     if [ $? -ne 0 ]; then
         print_error "Échec de l'installation des dépendances."
@@ -135,6 +135,32 @@ setup_database() {
     fi
     
     print_success "Structure de la base de données créée ✓"
+}
+
+# Fonction pour vérifier/créer le fichier .env.local
+setup_openrouter_key() {
+    if [ ! -f ".env.local" ]; then
+        print_warning "Aucune clé OpenRouter trouvée."
+        echo
+        echo "Pour utiliser OpenRouter, une clé API est nécessaire."
+        echo "Inscription : https://openrouter.ai/"
+        echo
+        read -p "Entrez votre clé OpenRouter (laisser vide si vous n'en avez pas encore) : " openrouter_key
+
+        if [ -z "$openrouter_key" ]; then
+            echo "OPENROUTER_API_KEY=" > .env.local
+            print_warning "Aucune clé saisie."
+            print_warning "Vous pourrez l'ajouter plus tard en éditant le fichier .env.local"
+        else
+            echo "OPENROUTER_API_KEY=$openrouter_key" > .env.local
+            print_success "Clé OpenRouter enregistrée ✓"
+        fi
+
+        chmod 600 .env.local
+        print_success "Fichier .env.local créé ✓"
+    else
+        print_success "Fichier .env.local déjà présent ✓"
+    fi
 }
 
 # Fonction pour afficher les informations de connexion
