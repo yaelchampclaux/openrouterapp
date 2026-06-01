@@ -74,7 +74,7 @@ setup_symfony_env() {
 # Fonction pour démarrer les conteneurs
 start_containers() {
     print_message "Démarrage des conteneurs Docker..."
-    docker-compose up -d --build
+    docker compose up -d --build
     
     if [ $? -ne 0 ]; then
         print_error "Échec du démarrage des conteneurs."
@@ -176,9 +176,9 @@ show_info() {
     echo -e "${BLUE}🐘 PostgreSQL:${NC}              localhost:5432"
     echo ""
     echo -e "${YELLOW}Commandes utiles:${NC}"
-    echo -e "  • Voir les logs:           ${GREEN}docker-compose logs -f${NC}"
-    echo -e "  • Arrêter:                 ${GREEN}docker-compose down${NC}"
-    echo -e "  • Redémarrer:              ${GREEN}docker-compose restart${NC}"
+    echo -e "  • Voir les logs:           ${GREEN}docker compose logs -f${NC}"
+    echo -e "  • Arrêter:                 ${GREEN}docker compose down${NC}"
+    echo -e "  • Redémarrer:              ${GREEN}docker compose restart${NC}"
     echo -e "  • Accéder au conteneur:    ${GREEN}docker exec -it www-ora /bin/bash${NC}"
     echo ""
 }
